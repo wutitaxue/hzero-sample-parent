@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>工作流演示</title>
+    <script src="/hsample-workflow/webjars/jquery/3.0.0/jquery.min.js?access_token=${accessToken}"></script>
+    <script src="/hsample-workflow/webjars/bootstrap/4.0.0/js/bootstrap.min.js?access_token=${accessToken}"></script>
+    <link rel="stylesheet"
+          href="/hsample-workflow/webjars/bootstrap/4.0.0/css/bootstrap.min.css?access_token=${accessToken}"/>
+    <script>
+        $(document).ready(function () {
+            $("#order-create").submit(function (event) {
+                let data = {
+                    produceName: $("#produceName").val(),
+                    quantity: $("#quantity").val(),
+                    unitPrice: $("#unitPrice").val(),
+                    <#if order??>
+                        orderNumber: $("#orderNumber").val(),
+                        balance: $("#balance").val(),
+                        orderStatus: $("#orderStatus").val()
+                    </#if>
+                };
+                $.ajax({
+                    url: "/hsample-workflow/v1/${organizationId?string('######')}/order<#if order??>/${order.orderId?string('######')}/approve</#if>?access_token=${accessToken}",
+                    type: <#if order??>"put"<#else>"post"</#if>,
+                    contentType: "application/json;charset=UTF-8",
+                    data: JSON.stringify(data),
+                    success: function (e) {
+                        location.reload();
+                    }
+                });
+                event.preventDefault();
+            });
+        })
+    </script>
+</head>
+<body>
+<div style="padding: 32px; margin: auto">
+    <form id="order-create" role="form" action="#">
+        <#if order??>
+        <div class="form-group row">
+            <label for="orderNumber" class="col-md-1 control-label" style="text-align: right;line-height: 38px">订单编号</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="orderNumber" value="${order.orderNumber}" readonly>
+            </div>
+        </div>
+        </#if>
+        <div class="form-group row">
+            <label for="produceName" class="col-md-1 control-label" style="text-align: right;line-height: 38px">产品名称</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="produceName" placeholder="请输入产品" value="${(order.produceName)!}" <#if readOnly>readOnly</#if>>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="quantity" class="col-md-1 control-label" style="text-align: right;line-height: 38px">产品数量</label>
+            <div class="col-md-6">
+                <input type="number" class="form-control" id="quantity" value="${(order.quantity)!1?string('######')}" min="1" <#if readOnly>readOnly</#if>>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="unitPrice" class="col-md-1 control-label" style="text-align: right;line-height: 38px">单价</label>
+            <div class="col-md-6">
+                <input type="number" class="form-control" id="unitPrice" value="<#if (order.unitPrice)??>${(order.unitPrice)?string('######.00')}<#else>0.0</#if>" min="0" <#if readOnly>readOnly</#if>>
+            </div>
+        </div>
+        <#if order??>
+        <div class="form-group row">
+            <label for="applicantName" class="col-md-1 control-label" style="text-align: right;line-height: 38px">申请人</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="applicantName" value="${(order.applicantName)!}" readOnly>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="purchaserName" class="col-md-1 control-label" style="text-align: right;line-height: 38px">采购人</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="purchaserName" value="${(order.purchaserName)!}" readOnly>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="financeName" class="col-md-1 control-label" style="text-align: right;line-height: 38px">财务审核人</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="financeName" value="${(order.financeName)!}" readOnly>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="balance" class="col-md-1 control-label" style="text-align: right;line-height: 38px">剩余金额</label>
+            <div class="col-md-6">
+                <input type="number" class="form-control" id="balance" value="<#if (order.balance)??>${(order.balance)?string('######.00')}<#else>0.0</#if>" min="0" <#if readOnly>readOnly</#if>>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="orderStatus" class="col-md-1 control-label" style="text-align: right;line-height: 38px">订单状态</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="orderStatus" value="${(order.orderStatusMeaning)!}" readOnly>
+        </div>
+        </#if>
+        <#if !readOnly>
+        <div class="col-md-1 offset-md-6" style="text-align: right">
+            <button type="submit" class="btn btn-primary" style="display:inline-block;">保存</button>
+        </div>
+        </#if>
+    </form>
+</div>
+</body>
+</html>
